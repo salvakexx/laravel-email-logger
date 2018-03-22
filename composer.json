@@ -1,0 +1,14 @@
+{
+    "name": "salvakexx/laravel-email-logger",
+    "description": "Simple Laravel package for logging via mail",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dmytro Tymoshenko",
+            "email": "kexxdon@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
