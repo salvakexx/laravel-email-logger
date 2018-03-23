@@ -17,10 +17,10 @@ class EmailLoggerServiceProvider extends ServiceProvider
 //            __DIR__.'/views' => base_path('resources/views/laraveldaily/timezones'),
 //        ]);
 
-        $this->loadViewsFrom(__DIR__.'/views', 'email-logger');
+        $this->loadViewsFrom(__DIR__.'/../views', 'email-logger');
 
         $this->publishes([
-            __DIR__.'/config/email-logger.php' => config_path('email-logger.php'),
+            __DIR__.'/../config/email-logger.php' => config_path('email-logger.php'),
         ]);
     }
 

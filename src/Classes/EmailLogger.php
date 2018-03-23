@@ -4,6 +4,7 @@ namespace Salvakexx\EmailLogger;
 
 
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Mail;
 
 class EmailLogger
@@ -14,7 +15,19 @@ class EmailLogger
      */
     public function __construct()
     {
+        $this->setDefaultEmails();
+    }
+
+    public function emails($emails)
+    {
+        $this->setEmails($emails);
+        return $this;
+    }
+
+    protected function setDefaultEmails()
+    {
         $this->setEmails(config('email-logger.emails')?:[]);
+        return $this;
     }
 
     public function info($request, $message = false)
@@ -30,14 +43,17 @@ class EmailLogger
 
     public function error($exception, $request, $message = false)
     {
-        $data = array_merge(
+        $this->sendEmail('email-logger::mail.error',$this->errorData($exception,$request,$message));
+    }
+
+    public function errorData($exception, $request, $message = false)
+    {
+        return array_merge(
             $this->getBaseData(),
             $this->getRequestData($request),
             $this->getExceptionData($exception),[
             'messageLog' => $this->prepareMessage($message),
         ]);
-
-        $this->sendEmail('email-logger::mail.error',$data);
     }
 
     protected function prepareMessage($message)
@@ -49,6 +65,7 @@ class EmailLogger
         }
         return $return;
     }
+
     protected function getRequestData(Request $request)
     {
         return [
@@ -74,7 +91,7 @@ class EmailLogger
         ];
     }
 
-    protected function sendEmail($view,$data,$logType = 'error')
+    public function sendEmail($view,$data,$logType = 'error')
     {
         if(empty($this->getEmails())){
             return false;
@@ -104,9 +121,16 @@ class EmailLogger
             return false;
         }
 
+        $this->setDefaultEmails();
+
         return true;
     }
 
+    public function getViewMailable($view,$data)
+    {
+        return (new MailMessage)
+            ->view($view,$data);
+    }
 
     public function getEmails()
     {
