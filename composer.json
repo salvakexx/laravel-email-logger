@@ -10,5 +10,14 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {}
+    "require": {
+        "laravel/framework": "^5.4.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Salvakexx\\EmailLogger\\EmailLoggerServiceProvider"
+            ]
+        }
+    }
 }
