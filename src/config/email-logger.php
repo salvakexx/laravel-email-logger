@@ -8,5 +8,5 @@ return [
 
     'from' => 'error@example.com',
     'from_name' => 'Error Mailer',
-    'subject' => 'Some error happened at site',
+    'subject' => 'Please check log message',
 ];

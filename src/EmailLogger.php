@@ -5,7 +5,6 @@ namespace Salvakexx\EmailLogger;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-use League\Flysystem\Exception;
 
 class EmailLogger
 {
@@ -23,10 +22,10 @@ class EmailLogger
         $data = array_merge(
             $this->getBaseData(),
             $this->getRequestData($request),[
-            'message' => $this->prepareMessage($message),
+            'messageLog' => $this->prepareMessage($message),
         ]);
 
-        $this->sendEmail('email-logger::mail.info',$data);
+        $this->sendEmail('email-logger::mail.info',$data, 'info');
     }
 
     public function error($exception, $request, $message = false)
@@ -35,7 +34,7 @@ class EmailLogger
             $this->getBaseData(),
             $this->getRequestData($request),
             $this->getExceptionData($exception),[
-            'message' => $this->prepareMessage($message),
+            'messageLog' => $this->prepareMessage($message),
         ]);
 
         $this->sendEmail('email-logger::mail.error',$data);
@@ -46,7 +45,7 @@ class EmailLogger
         try{
             $return = is_string($message) ? $message : print_r($message,1);
         } catch (Exception $exception){
-            $return = 'Cannot print this message sorry '.get_class($message);
+            $return = 'Cannot print this message sorry '.get_class($exception);
         }
         return $return;
     }
@@ -57,7 +56,7 @@ class EmailLogger
             'requestParameters' => print_r($request->all(),1),
         ];
     }
-    protected function getExceptionData(Exception $exception)
+    protected function getExceptionData(\Exception $exception)
     {
         return [
             'exceptionCode' => $exception->getCode(),
@@ -65,7 +64,7 @@ class EmailLogger
             'exceptionMessage' => $exception->getMessage(),
             'exceptionFile' => $exception->getFile(),
             'exceptionLine' => $exception->getLine(),
-            'exceptionTrace' => print_r($exception->getTrace(),1),
+            'exceptionTrace' => $exception->getTraceAsString(),
         ];
     }
     protected function getBaseData()
@@ -75,14 +74,13 @@ class EmailLogger
         ];
     }
 
-    protected function sendEmail($view,$data)
+    protected function sendEmail($view,$data,$logType = 'error')
     {
-        if(empty($emails)){
+        if(empty($this->getEmails())){
             return false;
         }
-
         try{
-            Mail::send($view, $data, function($message)
+            Mail::send($view, $data, function($message) use ($logType)
             {
                 $emails = $this->getEmails();
                 $message->from(config('email-logger.from'),config('email-logger.from_name'));
@@ -91,9 +89,9 @@ class EmailLogger
                     array_shift($emails);
                     $message->cc($emails);
                 }
-                $message->subject(config('email-logger.subject'));
+                $message->subject('['.$logType.'] '.config('email-logger.subject'));
             });
-
+//        }catch (\Swift_TransportException $exception){
         }catch (Exception $exception){
             \Log::error('Email message were not send. Trouble with your driver');
             \Log::error(implode(' ',[

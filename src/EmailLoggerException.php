@@ -8,10 +8,7 @@
 
 namespace Salvakexx\EmailLogger;
 
-
-use Symfony\Component\HttpKernel\Exception\HttpException;
-
-class EmailLoggerException extends HttpException
+class EmailLoggerException extends \Exception
 {
     //we cannot use exceptions cause we are handling them bro...
 }

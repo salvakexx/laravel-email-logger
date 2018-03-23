@@ -3,6 +3,6 @@
 <p>Parameters : </p>
 <p>
 <pre>
-    {{$requestParameters}}
+{{$requestParameters}}
 </pre>
 </p>
