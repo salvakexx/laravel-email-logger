@@ -44,7 +44,7 @@ class EmailLogger
     {
         try{
             $return = is_string($message) ? $message : print_r($message,1);
-        } catch (Exception $exception){
+        } catch (\Exception $exception){
             $return = 'Cannot print this message sorry '.get_class($exception);
         }
         return $return;
