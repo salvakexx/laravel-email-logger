@@ -17,12 +17,5 @@
         "psr-4": {
             "Salvakexx\\EmailLogger\\": "src/Classes"
         }
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Salvakexx\\EmailLogger\\EmailLoggerServiceProvider"
-            ]
-        }
     }
 }
