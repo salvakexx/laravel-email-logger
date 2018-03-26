@@ -3,6 +3,7 @@
 namespace Salvakexx\EmailLogger;
 
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Mail;
@@ -30,28 +31,30 @@ class EmailLogger
         return $this;
     }
 
-    public function info($request, $message = false)
+    public function info($request, $message = false, $user = false)
     {
         $data = array_merge(
             $this->getBaseData(),
-            $this->getRequestData($request),[
+            $this->getRequestData($request),
+            $this->getUserData($user),[
             'messageLog' => $this->prepareMessage($message),
         ]);
 
         $this->sendEmail('email-logger::mail.info',$data, 'info');
     }
 
-    public function error($exception, $request, $message = false)
+    public function error($exception, $request, $message = false, $user = false)
     {
-        $this->sendEmail('email-logger::mail.error',$this->errorData($exception,$request,$message));
+        $this->sendEmail('email-logger::mail.error',$this->errorData($exception,$request,$message,$user));
     }
 
-    public function errorData($exception, $request, $message = false)
+    public function errorData($exception, $request, $message = false, $user = false)
     {
         return array_merge(
             $this->getBaseData(),
             $this->getRequestData($request),
-            $this->getExceptionData($exception),[
+            $this->getExceptionData($exception),
+            $this->getUserData($user),[
             'messageLog' => $this->prepareMessage($message),
         ]);
     }
@@ -83,6 +86,16 @@ class EmailLogger
             'exceptionLine' => $exception->getLine(),
             'exceptionTrace' => $exception->getTraceAsString(),
         ];
+    }
+    protected function getUserData($user = false)
+    {
+        $return = ['user'=>false];
+        if($user instanceof Model){
+            $return['user'] = print_r($user->toArray(),1);
+        }elseif (is_array($user)){
+            $return['user'] = print_r($user,1);
+        }
+        return $return;
     }
     protected function getBaseData()
     {

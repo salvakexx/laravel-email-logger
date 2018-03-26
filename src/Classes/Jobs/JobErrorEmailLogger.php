@@ -15,9 +15,9 @@ class JobErrorEmailLogger implements ShouldQueue
 
     protected $data;
 
-    public function __construct(Request $request,\Exception $exception,$message = false)
+    public function __construct(Request $request,\Exception $exception,$message = false,$user = false)
     {
-        $this->data = \EmailLogger::errorData($exception,$request,$message);
+        $this->data = \EmailLogger::errorData($exception,$request,$message,$user);
     }
 
     /**

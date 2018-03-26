@@ -19,9 +19,9 @@ class NotificateErrorEmailLogger extends Notification implements ShouldQueue
      *
      * @param Request $request
      */
-    public function __construct(Request $request,\Exception $exception,$message = false)
+    public function __construct(Request $request,\Exception $exception,$message = false,$user = false)
     {
-        $this->data = \EmailLogger::errorData($exception,$request,$message);
+        $this->data = \EmailLogger::errorData($exception,$request,$message,$user);
     }
 
     /**
