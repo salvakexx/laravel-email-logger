@@ -11,12 +11,11 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": "^5.3.3 || ^7.0",
-        "laravel/framework": "^5.1.0"
+        "laravel/framework": "^5.4.0"
     },
     "autoload": {
         "psr-4": {
-            "Salvakexx\\EmailLogger\\": "src/"
+            "Salvakexx\\EmailLogger\\": "src/Classes"
         }
     },
     "extra": {
