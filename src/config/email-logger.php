@@ -14,4 +14,6 @@ return [
 
     'subject' => 'Please check log message',
 //    'subject'   => env('MAIL_LOGGER_SUBJECT'),
+
+    'excludeRequestFields' => [],
 ];

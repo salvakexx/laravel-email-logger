@@ -31,11 +31,11 @@ class EmailLogger
         return $this;
     }
 
-    public function info($request, $message = false, $user = false)
+    public function info($request, $message = false, $user = false, $excludeFields = [])
     {
         $data = array_merge(
             $this->getBaseData(),
-            $this->getRequestData($request),
+            $this->getRequestData($request, $excludeFields),
             $this->getUserData($user),[
             'messageLog' => $this->prepareMessage($message),
         ]);
@@ -43,16 +43,16 @@ class EmailLogger
         $this->sendEmail('email-logger::mail.info',$data, 'info');
     }
 
-    public function error($exception, $request, $message = false, $user = false)
+    public function error($exception, $request, $message = false, $user = false, $excludeFields = [])
     {
-        $this->sendEmail('email-logger::mail.error',$this->errorData($exception,$request,$message,$user));
+        $this->sendEmail('email-logger::mail.error', $this->errorData($exception, $request, $message, $user, $excludeFields));
     }
 
-    public function errorData($exception, $request, $message = false, $user = false)
+    public function errorData($exception, $request, $message = false, $user = false, $excludeFields = [])
     {
         return array_merge(
             $this->getBaseData(),
-            $this->getRequestData($request),
+            $this->getRequestData($request, $excludeFields),
             $this->getExceptionData($exception),
             $this->getUserData($user),[
             'messageLog' => $this->prepareMessage($message),
@@ -69,11 +69,11 @@ class EmailLogger
         return $return;
     }
 
-    protected function getRequestData(Request $request)
+    protected function getRequestData(Request $request, $excludeFields = [])
     {
         return [
             'requestUrl' => url($request->getPathInfo()),
-            'requestParameters' => print_r($request->all(),1),
+            'requestParameters' => print_r(array_except($request->all(), array_merge($excludeFields, config('email-logger.excludeRequestFields')?:[])),1),
         ];
     }
     protected function getExceptionData(\Exception $exception)
@@ -121,8 +121,7 @@ class EmailLogger
                 }
                 $message->subject('['.$logType.'] '.config('email-logger.subject'));
             });
-//        }catch (\Swift_TransportException $exception){
-        }catch (Exception $exception){
+        }catch (\Throwable $exception){
             \Log::error('Email message were not send. Trouble with your driver');
             \Log::error(implode(' ',[
                 get_class($exception),
